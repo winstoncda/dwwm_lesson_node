@@ -24,6 +24,15 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-type"],
+    credentials: true,
+  })
+);
+
 // chaque route localhost:5000 sera redirigé vers le dossier routes
 app.use("/", routes);
 
