@@ -9,7 +9,7 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     if (user || secondUser) {
-      res.status(400).json({ message: "Déjà inscrit" });
+      return res.status(400).json({ message: "Déjà inscrit" });
     }
     const newUser = new User({
       username,
