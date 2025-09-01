@@ -3,6 +3,9 @@ import TempUser from "../models/tempuser.schema.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { sendConfirmationEmail } from "../email/email.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const createTokenEmail = (email) => {
   return jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: "120s" });
@@ -78,5 +81,30 @@ export const login = async (req, res) => {
 };
 
 export const verifyMail = async (req, res) => {
-  console.log("TEST EMAIl");
+  const { token } = req.params;
+  console.log(token);
+
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const tempUser = await TempUser.findOne({ email: decoded.email, token });
+    console.log(tempUser);
+
+    if (!tempUser) {
+      return res.redirect(`${process.env.CLIENT_URL}/register?message=error`);
+    }
+
+    const newUser = new User({
+      username: tempUser.username,
+      email: tempUser.email,
+      password: tempUser.password,
+    });
+    await newUser.save();
+    await TempUser.deleteOne({ email: tempUser.email });
+    res.redirect(`${process.env.CLIENT_URL}/register?message=success`);
+  } catch (error) {
+    console.log(error);
+    if (error.name === "TokenExpiredError") {
+      return res.redirect(`${process.env.CLIENT_URL}/register?message=error`);
+    }
+  }
 };
