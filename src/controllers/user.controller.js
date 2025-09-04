@@ -149,3 +149,11 @@ export const currentUser = async (req, res) => {
     res.status(400).json(null);
   }
 };
+
+export const logoutUser = async (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false,
+  });
+  res.status(200).json({ message: "Déconnexion réussie" });
+};
