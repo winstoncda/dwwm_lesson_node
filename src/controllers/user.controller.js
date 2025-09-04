@@ -103,7 +103,13 @@ export const verifyMail = async (req, res) => {
     console.log(tempUser);
 
     if (!tempUser) {
-      return res.redirect(`${process.env.CLIENT_URL}/register?message=error`);
+      return res.redirect(
+        `${
+          process.env.MODE === "development"
+            ? process.env.CLIENT_URL
+            : process.env.DEPLOY_FRONT_URL
+        }/register?message=error`
+      );
     }
 
     const newUser = new User({
@@ -113,11 +119,23 @@ export const verifyMail = async (req, res) => {
     });
     await newUser.save();
     await TempUser.deleteOne({ email: tempUser.email });
-    res.redirect(`${process.env.CLIENT_URL}/register?message=success`);
+    res.redirect(
+      `${
+        process.env.MODE === "development"
+          ? process.env.CLIENT_URL
+          : process.env.DEPLOY_FRONT_URL
+      }/register?message=success`
+    );
   } catch (error) {
     console.log(error);
     if (error.name === "TokenExpiredError") {
-      return res.redirect(`${process.env.CLIENT_URL}/register?message=error`);
+      return res.redirect(
+        `${
+          process.env.MODE === "development"
+            ? process.env.CLIENT_URL
+            : process.env.DEPLOY_FRONT_URL
+        }/register?message=error`
+      );
     }
   }
 };
