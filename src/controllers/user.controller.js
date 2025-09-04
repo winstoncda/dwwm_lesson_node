@@ -76,6 +76,18 @@ export const login = async (req, res) => {
   }
   // 3 - ajout des données
 
+  const token = jwt.sign({}, process.env.SECRET_KEY, {
+    subject: user._id.toString(),
+    expiresIn: "7d",
+    algorithm: "HS256",
+  });
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: false,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
   // 4 - envoi données et/ou message front
   res.status(200).json({ user, message: "Connexion réussie" });
 };
